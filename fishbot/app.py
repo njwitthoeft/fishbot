@@ -25,27 +25,27 @@ app = Flask(__name__)
 def hello_world():
     return "Hello World!"
 
-### Verification endpoint for slac
 @app.route('/endpoint', methods = ['POST'])
 def endpoint():
     if request.method == 'POST':
         request_data = request.get_json()
+        #Verification for slack's sake.
         if a := request_data.get("challenge"):
             return a
-        else:
-            raw_text = request_data["event"]["text"]
-            channel_id = request_data["event"]["channel"]
+        
+        raw_text = request_data["event"]["text"]
+        channel_id = request_data["event"]["channel"]
 
-            if raw_text.lower() in profiles:
-                response = requests.get(f"https://www.fishwatch.gov/api/species/{raw_text.lower().replace(' ','-')}")
-                try:
-                    client.chat_postMessage(
-                        channel = channel_id,
-                        text = cleanhtml(json.loads(response.text)[0]["Habitat"])
-                    )
-                except:
-                    SlackApiError()
-            return json.dumps({'success':True}), 200, {'ContentType':'application/json'} 
+        if raw_text.lower() in profiles:
+            response = requests.get(f"https://www.fishwatch.gov/api/species/{raw_text.lower().replace(' ','-')}")
+            try:
+                client.chat_postMessage(
+                    channel = channel_id,
+                    text = cleanhtml(json.loads(response.text)[0]["Habitat"])
+                )
+            except:
+                SlackApiError()
+        return json.dumps({'success':True}), 200, {'ContentType':'application/json'} 
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port =8080)
