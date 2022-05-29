@@ -13,7 +13,6 @@ slack_token = os.environ["SLACK_BOT_TOKEN"]
 client = WebClient(token=slack_token)
 
 import re
-# as per recommendation from @freylis, compile once only
 CLEANR = re.compile('<.*?>') 
 
 def cleanhtml(raw_html):
